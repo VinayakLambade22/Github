@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../shared/Navbar";
 import { updateUserProfile, deleteUserProfile } from "../../services/api";
@@ -10,6 +10,7 @@ const EditProfile = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState(currentUser.username);
   const [email, setEmail] = useState(currentUser.email);
+  const [confirmName, setConfirmName] = useState(""); // ✅ for delete confirmation
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -26,11 +27,7 @@ const EditProfile = () => {
   };
 
   const handleDelete = async () => {
-    if (
-      window.prompt(
-        `To delete your account, please type your username "${currentUser.username}"`
-      ) === currentUser.username
-    ) {
+    if (confirmName === currentUser.username) {
       try {
         await deleteUserProfile(currentUser._id);
         alert("Account deleted successfully.");
@@ -71,14 +68,29 @@ const EditProfile = () => {
             </button>
           </div>
         </form>
+
         <div className="settings-section danger-zone">
           <h3>Delete Account</h3>
           <div className="danger-item">
             <div>
               <strong>This action is irreversible.</strong>
-              <p>All your repositories and data will be permanently removed.</p>
+              <p>
+                All your repositories and data will be permanently removed.
+                Please type <b>{currentUser.username}</b> to confirm.
+              </p>
+              <input
+                className="danger-input"
+                type="text"
+                placeholder={`Type "${currentUser.username}" to confirm`}
+                value={confirmName}
+                onChange={(e) => setConfirmName(e.target.value)}
+              />
             </div>
-            <button onClick={handleDelete} className="btn-danger">
+            <button
+              onClick={handleDelete}
+              className="btn-danger"
+              disabled={confirmName !== currentUser.username} 
+            >
               Delete your account
             </button>
           </div>
@@ -87,4 +99,5 @@ const EditProfile = () => {
     </>
   );
 };
+
 export default EditProfile;

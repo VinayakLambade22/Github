@@ -1,4 +1,3 @@
-import React from "react";
 import HeatMap from "@uiw/react-heat-map";
 
 const value = Array.from({ length: 365 }, (_, i) => ({

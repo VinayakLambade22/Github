@@ -65,7 +65,17 @@
   background-color: #da3633;
   color: white;
   border-color: #f85149;
+  margin: 0.5rem;
 }
 .btn-danger:hover {
   background-color: #f85149;
+}
+
+.danger-input {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 5px 12px;
+  color: #c9d1d9;
+  margin-top: 0.5rem;
 }

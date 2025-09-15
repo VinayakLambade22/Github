@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../shared/Navbar";
 import { createNewIssue, getRepoDetails } from "../../services/api";

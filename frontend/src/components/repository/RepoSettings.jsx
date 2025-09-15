@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../shared/Navbar";
 import {
@@ -13,6 +13,7 @@ const RepoSettings = () => {
   const navigate = useNavigate();
   const [repo, setRepo] = useState(null);
   const [newName, setNewName] = useState("");
+  const [confirmName, setConfirmName] = useState("");
 
   useEffect(() => {
     const fetchRepo = async () => {
@@ -38,11 +39,7 @@ const RepoSettings = () => {
   };
 
   const handleDelete = async () => {
-    if (
-      window.prompt(
-        `This action is irreversible. To confirm, type the repository name "${repo.name}"`
-      ) === repo.name
-    ) {
+    if (confirmName === repo.name) {
       try {
         await deleteRepo(repo._id);
         navigate("/");
@@ -83,11 +80,22 @@ const RepoSettings = () => {
             <div>
               <strong>Delete this repository</strong>
               <p>
-                Once you delete a repository, there is no going back. Please be
-                certain.
+                Once you delete a repository, there is no going back. Please
+                type <b>{repo.name}</b> to confirm.
               </p>
+              <input
+                className="danger-input"
+                type="text"
+                placeholder={`Type "${repo.name}" to confirm`}
+                value={confirmName}
+                onChange={(e) => setConfirmName(e.target.value)}
+              />
             </div>
-            <button onClick={handleDelete} className="btn-danger">
+            <button
+              onClick={handleDelete}
+              className="btn-danger"
+              disabled={confirmName !== repo.name}
+            >
               Delete Repository
             </button>
           </div>
