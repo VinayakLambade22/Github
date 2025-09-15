@@ -1,0 +1,71 @@
+.settings-container {
+  max-width: 980px;
+  margin: 24px auto;
+  padding: 0 24px;
+}
+.settings-container h2 {
+  font-size: 24px;
+  font-weight: 400;
+  margin-bottom: 24px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #30363d;
+}
+.settings-section {
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  margin-bottom: 24px;
+}
+.settings-section h3 {
+  padding: 12px 16px;
+  background-color: #161b22;
+  border-bottom: 1px solid #30363d;
+  margin: 0;
+  font-size: 16px;
+}
+.settings-section .form-content {
+  padding: 16px;
+}
+.settings-section label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 8px;
+}
+.settings-section input[type="text"],
+.settings-section input[type="email"],
+.settings-section textarea {
+  margin-bottom: 16px;
+  max-width: 400px;
+}
+.btn-primary {
+  background-color: #238636;
+  color: white;
+  align-self: flex-start;
+}
+.btn-primary:hover {
+  background-color: #2ea043;
+}
+.danger-zone h3 {
+  color: #f85149;
+}
+.danger-zone {
+  border-color: #f85149;
+}
+.danger-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+}
+.danger-item p {
+  color: #8b949e;
+  margin: 4px 0 0 0;
+  font-size: 14px;
+}
+.btn-danger {
+  background-color: #da3633;
+  color: white;
+  border-color: #f85149;
+}
+.btn-danger:hover {
+  background-color: #f85149;
+}

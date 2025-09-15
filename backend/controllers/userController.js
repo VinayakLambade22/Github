@@ -1,215 +1,75 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const { MongoClient, ObjectId } = require("mongodb");
-const dotenv = require("dotenv");
+const User = require('../models/user.model');
+const Repository = require('../models/repository.model');
+const jwt = require('jsonwebtoken');
 
-dotenv.config();
-const uri = process.env.MONGODB_URI;
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+};
 
-let client;
-
-async function connectClient() {
-  if (!client) {
-    client = new MongoClient(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    await client.connect();
-  }
-}
-
-async function authMiddleware(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1]; // Bearer <token>
-  if (!token) {
-    return res.status(401).json({ message: "No token, authorization denied" });
-  }
-
+exports.signup = async (req, res) => {
+  const { username, email, password } = req.body;
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    req.user = decoded; // { id: ObjectId }
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: "Token is not valid" });
-  }
-}
-
-async function signup(req, res) {
-  const { username, password, email } = req.body;
-  try {
-    await connectClient();
-    const db = client.db("Github");
-    const usersCollection = db.collection("users");
-
-    const user = await usersCollection.findOne({ username });
+    const userExists = await User.findOne({ email });
+    if (userExists) return res.status(400).json({ message: 'User already exists' });
+    const user = await User.create({ username, email, password });
     if (user) {
-      return res.status(400).json({ message: "User already exists!" });
+      res.status(201).json({ _id: user._id, username: user.username, email: user.email, token: generateToken(user._id) });
+    } else {
+      res.status(400).json({ message: 'Invalid user data' });
     }
+  } catch (error) { res.status(500).json({ message: 'Server Error: ' + error.message }); }
+};
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = {
-      username,
-      password: hashedPassword,
-      email,
-      repositories: [],
-      followedUsers: [],
-      starRepos: [],
-    };
-
-    const result = await usersCollection.insertOne(newUser);
-
-    const token = jwt.sign(
-      { id: result.insertedId },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "1h" }
-    );
-    res.json({ token, userId: result.insertedId });
-  } catch (err) {
-    console.error("Error during signup : ", err.message);
-    res.status(500).send("Server error");
-  }
-}
-
-async function login(req, res) {
+exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    await connectClient();
-    const db = client.db("Github");
-    const usersCollection = db.collection("users");
-
-    const user = await usersCollection.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "Invalid credentials!" });
+    const user = await User.findOne({ email });
+    if (user && (await user.comparePassword(password))) {
+      res.json({ _id: user._id, username: user.username, email: user.email, token: generateToken(user._id) });
+    } else {
+      res.status(401).json({ message: 'Invalid email or password' });
     }
+  } catch (error) { res.status(500).json({ message: 'Server Error: ' + error.message }); }
+};
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials!" });
-    }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1h",
-    });
-    res.json({ token, userId: user._id });
-  } catch (err) {
-    console.error("Error during login : ", err.message);
-    res.status(500).send("Server error!");
-  }
-}
-
-async function getAllUsers(req, res) {
+exports.getUserProfile = async (req, res) => {
   try {
-    await connectClient();
-    const db = client.db("Github");
-    const usersCollection = db.collection("users");
+    const user = await User.findById(req.params.id).select('-password');
+    if (user) res.json(user);
+    else res.status(404).json({ message: 'User not found' });
+  } catch (error) { res.status(500).json({ message: 'Server Error: ' + error.message }); }
+};
 
-    const users = await usersCollection.find({}).toArray();
-    res.json(users);
-  } catch (err) {
-    console.error("Error during fetching : ", err.message);
-    res.status(500).send("Server error!");
-  }
-}
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({}).select('-password');
+        res.json(users);
+    } catch (error) { res.status(500).json({ message: "Server Error" }); }
+};
 
-async function getUserProfile(req, res) {
-  const currentID = req.params.id;
+exports.updateUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (user) {
+            user.username = req.body.username || user.username;
+            user.email = req.body.email || user.email;
+            const updatedUser = await user.save();
+            res.json({ _id: updatedUser._id, username: updatedUser.username, email: updatedUser.email });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) { res.status(500).json({ message: 'Server Error: ' + error.message }); }
+};
 
-  if (!ObjectId.isValid(currentID)) {
-    return res.status(400).json({ message: "Invalid user ID" });
-  }
-
-  try {
-    await connectClient();
-    const db = client.db("Github");
-    const usersCollection = db.collection("users");
-
-    const user = await usersCollection.findOne({
-      _id: new ObjectId(currentID),
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found!" });
-    }
-
-    res.send(user);
-  } catch (err) {
-    console.error("Error during fetching : ", err.message);
-    res.status(500).send("Server error!");
-  }
-}
-
-async function updateUserProfile(req, res) {
-  const currentID = req.params.id;
-  const { email, password } = req.body;
-
-  if (!ObjectId.isValid(currentID)) {
-    return res.status(400).json({ message: "Invalid user ID" });
-  }
-
-  try {
-    await connectClient();
-    const db = client.db("Github");
-    const usersCollection = db.collection("users");
-
-    let updateFields = {};
-    if (email) updateFields.email = email;
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      updateFields.password = hashedPassword;
-    }
-
-    const result = await usersCollection.findOneAndUpdate(
-      { _id: new ObjectId(currentID) },
-      { $set: updateFields },
-      { returnDocument: "after" }
-    );
-
-    if (!result.value) {
-      return res.status(404).json({ message: "User not found!" });
-    }
-
-    res.send(result.value);
-  } catch (err) {
-    console.error("Error during updating : ", err.message);
-    res.status(500).send("Server error!");
-  }
-}
-
-async function deleteUserProfile(req, res) {
-  const currentID = req.params.id;
-
-  if (!ObjectId.isValid(currentID)) {
-    return res.status(400).json({ message: "Invalid user ID" });
-  }
-
-  try {
-    await connectClient();
-    const db = client.db("Github");
-    const usersCollection = db.collection("users");
-
-    const result = await usersCollection.deleteOne({
-      _id: new ObjectId(currentID),
-    });
-
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ message: "User not found!" });
-    }
-
-    res.json({ message: "User Profile Deleted!" });
-  } catch (err) {
-    console.error("Error during deleting : ", err.message);
-    res.status(500).send("Server error!");
-  }
-}
-
-module.exports = {
-  getAllUsers,
-  signup,
-  login,
-  getUserProfile,
-  updateUserProfile,
-  deleteUserProfile,
-  authMiddleware, 
-}
+exports.deleteUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (user) {
+            await Repository.deleteMany({ owner: req.params.id });
+            await User.deleteOne({_id: req.params.id});
+            res.json({ message: 'User removed' });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) { res.status(500).json({ message: 'Server Error: ' + error.message }); }
+};

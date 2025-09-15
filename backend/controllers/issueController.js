@@ -1,103 +1,44 @@
-const mongoose = require("mongoose");
-const Repository = require("../models/repoModel");
-const User = require("../models/userModel");
-const Issue = require("../models/issueModel");
+const Issue = require("../models/issue.model");
+const Repository = require("../models/repository.model");
 
-async function createIssue(req, res) {
-  const { title, description } = req.body;
-  const { id } = req.params;
-
+exports.createIssue = async (req, res) => {
+  const { title, description, authorId, repoId } = req.body;
   try {
-    const issue = new Issue({
+    const repository = await Repository.findById(repoId);
+    if (!repository)
+      return res.status(404).json({ message: "Repository not found" });
+    const issue = await Issue.create({
       title,
       description,
-      repository: id,
+      author: authorId,
+      repository: repoId,
     });
-
-    await issue.save();
-
+    repository.issues.push(issue._id);
+    await repository.save();
     res.status(201).json(issue);
-  } catch (err) {
-    console.error("Error during issue creation : ", err.message);
-    res.status(500).send("Server error");
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
   }
-}
+};
 
-async function updateIssueById(req, res) {
-  const { id } = req.params;
-  const { title, description, status } = req.body;
+exports.getAllIssuesForRepo = async (req, res) => {
   try {
-    const issue = await Issue.findById(id);
-
-    if (!issue) {
-      return res.status(404).json({ error: "Issue not found!" });
-    }
-
-    issue.title = title;
-    issue.description = description;
-    issue.status = status;
-
-    await issue.save();
-
-    res.json(issue, { message: "Issue updated" });
-  } catch (err) {
-    console.error("Error during issue updation : ", err.message);
-    res.status(500).send("Server error");
+    const issues = await Issue.find({ repository: req.params.repoId }).populate(
+      "author",
+      "username"
+    );
+    res.json(issues);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
   }
-}
+};
 
-async function deleteIssueById(req, res) {
-  const { id } = req.params;
-
-  try {
-    const issue = Issue.findByIdAndDelete(id);
-
-    if (!issue) {
-      return res.status(404).json({ error: "Issue not found!" });
-    }
-    res.json({ message: "Issue deleted" });
-  } catch (err) {
-    console.error("Error during issue deletion : ", err.message);
-    res.status(500).send("Server error");
-  }
-}
-
-async function getAllIssues(req, res) {
-  const { id } = req.params;
-
-  try {
-    const issues = Issue.find({ repository: id });
-
-    if (!issues) {
-      return res.status(404).json({ error: "Issues not found!" });
-    }
-    res.status(200).json(issues);
-  } catch (err) {
-    console.error("Error during issue fetching : ", err.message);
-    res.status(500).send("Server error");
-  }
-}
-
-async function getIssueById(req, res) {
-  const { id } = req.params;
-  try {
-    const issue = await Issue.findById(id);
-
-    if (!issue) {
-      return res.status(404).json({ error: "Issue not found!" });
-    }
-
-    res.json(issue);
-  } catch (err) {
-    console.error("Error during issue updation : ", err.message);
-    res.status(500).send("Server error");
-  }
-}
-
-module.exports = {
-  createIssue,
-  updateIssueById,
-  deleteIssueById,
-  getAllIssues,
-  getIssueById,
+exports.getIssueById = async (req, res) => {
+  res.status(501).json({ message: "Not implemented" });
+};
+exports.updateIssueById = async (req, res) => {
+  res.status(501).json({ message: "Not implemented" });
+};
+exports.deleteIssueById = async (req, res) => {
+  res.status(501).json({ message: "Not implemented" });
 };

@@ -1,0 +1,144 @@
+.repo-form-container {
+  max-width: 800px;
+  margin: 24px auto;
+  padding: 0 24px;
+}
+.repo-form-title {
+  font-size: 24px;
+  font-weight: 400;
+}
+.repo-form-subtitle {
+  font-size: 16px;
+  color: #8b949e;
+  margin-bottom: 24px;
+}
+.repo-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.repo-form input[type="text"] {
+  margin-bottom: 16px;
+}
+.visibility-options {
+  margin: 24px 0;
+  display: flex;
+  gap: 24px;
+}
+.repo-form-button {
+  background-color: #238636;
+  color: white;
+}
+.repo-form-button:hover {
+  background-color: #2ea043;
+}
+.repo-page-container {
+  max-width: 1280px;
+  margin: 24px auto;
+  padding: 0 24px;
+}
+.repo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.repo-header h2 {
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0;
+}
+.repo-tabs {
+  display: flex;
+  border-bottom: 1px solid #30363d;
+  margin-bottom: 24px;
+}
+.repo-tab {
+  padding: 8px 16px;
+  color: #c9d1d9;
+  border-bottom: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-family: inherit;
+}
+.repo-tab.active {
+  border-bottom-color: #f78166;
+  font-weight: 600;
+}
+.repo-tab:hover {
+  background-color: #161b22;
+  border-radius: 6px 6px 0 0;
+  text-decoration: none;
+}
+.repo-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+.setup-card {
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 24px;
+}
+.setup-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+.clone-url-container input {
+  width: 100%;
+}
+.issues-container .issues-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+.new-issue-btn {
+  background-color: #238636;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.new-issue-btn:hover {
+  background-color: #2ea043;
+}
+.issues-list-box {
+  border: 1px solid #30363d;
+  border-radius: 6px;
+}
+.issue-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid #21262d;
+}
+.issue-item:last-child {
+  border-bottom: none;
+}
+.issue-item-empty {
+  padding: 32px;
+  text-align: center;
+  color: #8b949e;
+}
+.issue-icon-open {
+  color: #3fb950;
+  margin-top: 2px;
+}
+.issue-details {
+  display: flex;
+  flex-direction: column;
+}
+.issue-title {
+  font-weight: 500;
+  color: #c9d1d9;
+}
+.issue-author {
+  font-size: 12px;
+  color: #8b949e;
+}

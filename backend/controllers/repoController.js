@@ -1,170 +1,104 @@
-const mongoose = require("mongoose");
-const Repository = require("../models/repoModel");
-const User = require("../models/userModel");
-const Issue = require("../models/issueModel");
+const Repository = require("../models/repository.model");
+const User = require("../models/user.model");
 
-async function createRepository(req, res) {
-  const { owner, name, issues, content, description, visibility } = req.body;
-
+exports.createRepository = async (req, res) => {
+  const { name, description, isPublic, ownerId } = req.body;
   try {
-    if (!name) {
-      return res.status(400).json({ error: "Repository name is required!" });
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(owner)) {
-      return res.status(400).json({ error: "Invalid User ID!" });
-    }
-
-    const newRepository = new Repository({
+    const owner = await User.findById(ownerId);
+    if (!owner) return res.status(404).json({ message: "Owner not found" });
+    const repository = await Repository.create({
       name,
       description,
-      visibility,
-      owner,
-      content,
-      issues,
+      isPublic,
+      owner: ownerId,
     });
+    owner.repositories.push(repository._id);
+    await owner.save();
+    res.status(201).json(repository);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
 
-    const result = await newRepository.save();
+exports.getAllRepositories = async (req, res) => {
+  try {
+    const repos = await Repository.find({ isPublic: true })
+      .populate("owner", "username")
+      .sort({ createdAt: -1 });
+    res.json(repos);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
 
-    res.status(201).json({
-      message: "Repository created!",
-      repositoryID: result._id,
+exports.fetchRepositoriesForCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userID).populate(
+      "repositories"
+    );
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ repositories: user.repositories });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
+exports.fetchRepositoryByName = async (req, res) => {
+  try {
+    const owner = await User.findOne({ username: req.params.ownerName });
+    if (!owner) return res.status(404).json({ message: "Owner not found" });
+    const repo = await Repository.findOne({
+      name: req.params.repoName,
+      owner: owner._id,
+    }).populate("owner", "username");
+    if (!repo) return res.status(404).json({ message: "Repository not found" });
+    res.json(repo);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
+exports.updateRepositoryById = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const repo = await Repository.findByIdAndUpdate(
+      req.params.id,
+      { name, description },
+      { new: true }
+    );
+    if (!repo) return res.status(404).json({ message: "Repository not found" });
+    res.json(repo);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
+exports.deleteRepositoryById = async (req, res) => {
+  try {
+    const repo = await Repository.findById(req.params.id);
+    if (!repo) return res.status(404).json({ message: "Repository not found" });
+    await User.findByIdAndUpdate(repo.owner, {
+      $pull: { repositories: repo._id },
     });
-  } catch (err) {
-    console.error("Error during repository creation : ", err.message);
-    res.status(500).send("Server error");
+    await Repository.deleteOne({ _id: req.params.id });
+    res.json({ message: "Repository successfully deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
   }
-}
+};
 
-async function getAllRepositories(req, res) {
+exports.toggleVisibilityById = async (req, res) => {
   try {
-    const repositories = await Repository.find({})
-      .populate("owner")
-      .populate("issues");
-
-    res.json(repositories);
-  } catch (err) {
-    console.error("Error during fetching repositories : ", err.message);
-    res.status(500).send("Server error");
+    const repo = await Repository.findById(req.params.id);
+    if (!repo) return res.status(404).json({ message: "Repository not found" });
+    repo.isPublic = !repo.isPublic;
+    await repo.save();
+    res.json(repo);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
   }
-}
+};
 
-async function fetchRepositoryById(req, res) {
-  const { id } = req.params;
-  try {
-    const repository = await Repository.find({ _id: id })
-      .populate("owner")
-      .populate("issues");
-
-    res.json(repository);
-  } catch (err) {
-    console.error("Error during fetching repository : ", err.message);
-    res.status(500).send("Server error");
-  }
-}
-
-async function fetchRepositoryByName(req, res) {
-  const { name } = req.params;
-  try {
-    const repository = await Repository.find({ name })
-      .populate("owner")
-      .populate("issues");
-
-    res.json(repository);
-  } catch (err) {
-    console.error("Error during fetching repository : ", err.message);
-    res.status(500).send("Server error");
-  }
-}
-
-async function fetchRepositoriesForCurrentUser(req, res) {
-  console.log(req.params);
-  const { userID } = req.params;
-
-  try {
-    const repositories = await Repository.find({ owner: userID });
-
-    if (!repositories || repositories.length == 0) {
-      return res.status(404).json({ error: "User Repositories not found!" });
-    }
-    console.log(repositories);
-    res.json({ message: "Repositories found!", repositories });
-  } catch (err) {
-    console.error("Error during fetching user repositories : ", err.message);
-    res.status(500).send("Server error");
-  }
-}
-
-async function updateRepositoryById(req, res) {
-  const { id } = req.params;
-  const { content, description } = req.body;
-
-  try {
-    const repository = await Repository.findById(id);
-    if (!repository) {
-      return res.status(404).json({ error: "Repository not found!" });
-    }
-
-    repository.content.push(content);
-    repository.description = description;
-
-    const updatedRepository = await repository.save();
-
-    res.json({
-      message: "Repository updated successfully!",
-      repository: updatedRepository,
-    });
-  } catch (err) {
-    console.error("Error during updating repository : ", err.message);
-    res.status(500).send("Server error");
-  }
-}
-
-async function toggleVisibilityById(req, res) {
-  const { id } = req.params;
-
-  try {
-    const repository = await Repository.findById(id);
-    if (!repository) {
-      return res.status(404).json({ error: "Repository not found!" });
-    }
-
-    repository.visibility = !repository.visibility;
-
-    const updatedRepository = await repository.save();
-
-    res.json({
-      message: "Repository visibility toggled successfully!",
-      repository: updatedRepository,
-    });
-  } catch (err) {
-    console.error("Error during toggling visibility : ", err.message);
-    res.status(500).send("Server error");
-  }
-}
-
-async function deleteRepositoryById(req, res) {
-  const { id } = req.params;
-  try {
-    const repository = await Repository.findByIdAndDelete(id);
-    if (!repository) {
-      return res.status(404).json({ error: "Repository not found!" });
-    }
-
-    res.json({ message: "Repository deleted successfully!" });
-  } catch (err) {
-    console.error("Error during deleting repository : ", err.message);
-    res.status(500).send("Server error");
-  }
-}
-
-module.exports = {
-  createRepository,
-  getAllRepositories,
-  fetchRepositoryById,
-  fetchRepositoryByName,
-  fetchRepositoriesForCurrentUser,
-  updateRepositoryById,
-  toggleVisibilityById,
-  deleteRepositoryById,
+exports.fetchRepositoryById = async (req, res) => {
+  res.status(501).json({ message: "Not implemented" });
 };

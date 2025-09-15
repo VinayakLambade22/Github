@@ -1,117 +1,60 @@
-import React, { useState, useEffect } from "react";
-import "./dashboard.css";
-import Navbar from "../Navbar";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import Navbar from '../shared/Navbar';
+import { getUserRepos } from '../../services/api';
+import { useAuth } from '../../authContext';
+import { RepoIcon } from '@primer/octicons-react';
+import '../../styles/dashboard.css';
+
+const popularRepos = [
+    { name: 'React', description: 'A declarative, efficient, and flexible JavaScript library for building user interfaces.' },
+    { name: 'Vue.js', description: 'The Progressive JavaScript Framework.' },
+];
 
 const Dashboard = () => {
-  const [repositories, setRepositories] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [suggestedRepositories, setSuggestedRepositories] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+    const [userRepos, setUserRepos] = useState([]);
+    const { currentUser } = useAuth();
 
-  useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    useEffect(() => {
+        const fetchUserRepos = async () => {
+            if (currentUser) {
+                try {
+                    const response = await getUserRepos(currentUser._id);
+                    setUserRepos(response.data.repositories || []);
+                } catch (error) { console.error("Failed to fetch user repositories:", error); }
+            }
+        };
+        fetchUserRepos();
+    }, [currentUser]);
 
-    const fetchRepositories = async () => {
-      try {
-        const response = await fetch(`http://localhost:3002/repo/user/${userId}`);
-        const data = await response.json();
-
-        if (data && Array.isArray(data.repositories)) {
-          setRepositories(data.repositories);
-        } else {
-          console.warn("No repositories found in response", data);
-          setRepositories([]);
-        }
-      } catch (err) {
-        console.error("Error while fetching user repositories:", err);
-        setRepositories([]);
-      }
-    };
-
-    const fetchSuggestedRepositories = async () => {
-      try {
-        const response = await fetch(`http://localhost:3002/repo/all`);
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          setSuggestedRepositories(data);
-        } else {
-          console.warn("Invalid suggested repositories response", data);
-          setSuggestedRepositories([]);
-        }
-      } catch (err) {
-        console.error("Error while fetching suggested repositories:", err);
-        setSuggestedRepositories([]);
-      }
-    };
-
-    fetchRepositories();
-    fetchSuggestedRepositories();
-  }, []);
-
-  useEffect(() => {
-    if (searchQuery === "") {
-      setSearchResults(repositories);
-    } else {
-      const filteredRepo = repositories.filter((repo) =>
-        repo.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setSearchResults(filteredRepo);
-    }
-  }, [searchQuery, repositories]);
-
-  return (
-    <>
-      <Navbar />
-      <section id="dashboard">
-        <aside>
-          <h3>Suggested Repositories</h3>
-          {Array.isArray(suggestedRepositories) && suggestedRepositories.length > 0 ? (
-            suggestedRepositories.map((repo) => (
-              <div key={repo._id}>
-                <h4>{repo.name}</h4>
-                <h4>{repo.description}</h4>
-              </div>
-            ))
-          ) : (
-            <p>No suggested repositories available.</p>
-          )}
-        </aside>
-
-        <main>
-          <h2>Your Repositories</h2>
-          <div id="search">
-            <input
-              type="text"
-              value={searchQuery}
-              placeholder="Search..."
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          {Array.isArray(searchResults) && searchResults.length > 0 ? (
-            searchResults.map((repo) => (
-              <div key={repo._id}>
-                <h4>{repo.name}</h4>
-                <h4>{repo.description}</h4>
-              </div>
-            ))
-          ) : (
-            <p>No repositories found.</p>
-          )}
-        </main>
-
-        <aside>
-          <h3>Upcoming Events</h3>
-          <ul>
-            <li><p>Tech Conference - Dec 15</p></li>
-            <li><p>Developer Meetup - Dec 25</p></li>
-            <li><p>React Summit - Jan 5</p></li>
-          </ul>
-        </aside>
-      </section>
-    </>
-  );
+    return (
+        <>
+            <Navbar />
+            <div className="dashboard-container">
+                <aside className="dashboard-sidebar left">
+                    <div className="sidebar-header"><h3>Recent Repositories</h3></div>
+                    {userRepos.length > 0 ? (
+                        <ul className="repo-list">
+                            {userRepos.map(repo => (
+                                <li key={repo._id}><Link to={`/${currentUser.username}/${repo.name}`}><RepoIcon size={16} /><span>{repo.name}</span></Link></li>
+                            ))}
+                        </ul>
+                    ) : <p className="no-repos-message">No repositories yet.</p>}
+                </aside>
+                <main className="dashboard-main">
+                    <h2>Home</h2>
+                    {popularRepos.map(repo => (
+                        <div className="repo-card" key={repo.name}>
+                            <h3>{repo.name}</h3><p>{repo.description}</p><a href="#">VIEW REPOSITORY</a>
+                        </div>
+                    ))}
+                </main>
+                <aside className="dashboard-sidebar right">
+                     <div className="sidebar-card"><h3>GitHub Trending</h3><a href="/explore">VIEW TRENDING</a></div>
+                </aside>
+            </div>
+        </>
+    );
 };
 
 export default Dashboard;
