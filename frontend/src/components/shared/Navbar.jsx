@@ -22,6 +22,12 @@ const Navbar = () => {
         <Link to="/">
           <img src={GithubLogo} alt="GitHub Logo" className="navbar-logo" />
         </Link>
+
+        <Link to="/explore" className="navbar-link">
+          Explore
+        </Link>
+      </div>
+      <div className="navbar-right">
         <div className="navbar-search-wrapper">
           <input
             type="text"
@@ -29,11 +35,6 @@ const Navbar = () => {
             className="navbar-search-input"
           />
         </div>
-        <Link to="/explore" className="navbar-link">
-          Explore
-        </Link>
-      </div>
-      <div className="navbar-right">
         {currentUser && (
           <>
             <div className="dropdown-container">
