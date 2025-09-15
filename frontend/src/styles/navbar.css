@@ -1,5 +1,4 @@
 .navbar-container {
-  background-color: #161b22;
   padding: 12px 24px;
   display: flex;
   align-items: center;
@@ -7,31 +6,39 @@
   border-bottom: 1px solid #30363d;
   color: #c9d1d9;
 }
+
 .navbar-left,
 .navbar-right {
   display: flex;
   align-items: center;
   gap: 16px;
 }
+
 .navbar-logo {
   height: 32px;
   width: 32px;
 }
+
 .navbar-search-wrapper {
   position: relative;
 }
+
 .navbar-search-input {
   background-color: #0d1117;
   border: 1px solid #30363d;
-  border-radius: 6px;
+  border-radius: 10px;
   padding: 5px 12px;
   color: #c9d1d9;
   width: 280px;
+  height: 32px;
 }
+
 .navbar-link {
   color: #c9d1d9;
   font-weight: 500;
+  text-decoration: none;
 }
+
 .navbar-button {
   background: none;
   border: none;
@@ -41,20 +48,25 @@
   align-items: center;
   gap: 4px;
 }
+
 .profile-button {
   padding: 0;
 }
+
 .navbar-avatar {
-  height: 24px;
-  width: 24px;
+  height: 32px;
+  width: 32px;
   border-radius: 50%;
 }
+
 .dropdown-caret {
   fill: currentColor;
 }
+
 .dropdown-container {
   position: relative;
 }
+
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -68,9 +80,11 @@
   z-index: 100;
   padding: 4px 0;
 }
+
 .create-dropdown {
-  right: -30px;
+  width: 160px;
 }
+
 .dropdown-item {
   display: block;
   padding: 8px 16px;
@@ -83,19 +97,29 @@
   text-align: left;
   cursor: pointer;
 }
+
 .dropdown-item:hover {
   background-color: #1f6feb;
   color: white;
 }
-.logout-button:hover {
-  background-color: #b32327;
+
+.logout-button {
+  width: 100%;
+  text-align: left;
 }
+
 .dropdown-header {
   padding: 8px 16px;
-  font-size: 12px;
+  font-size: 14px;
+  color: #8b949e;
 }
+
+.dropdown-header strong {
+  color: #c9d1d9;
+}
+
 .dropdown-divider {
   height: 1px;
-  margin: 4px 0;
+  margin: 8px 0;
   background-color: #30363d;
 }

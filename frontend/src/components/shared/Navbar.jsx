@@ -22,15 +22,11 @@ const Navbar = () => {
         <Link to="/">
           <img src={GithubLogo} alt="GitHub Logo" className="navbar-logo" />
         </Link>
-
-        <Link to="/explore" className="navbar-link">
-          Explore
-        </Link>
       </div>
       <div className="navbar-right">
         <div className="navbar-search-wrapper">
           <input
-            type="text"
+            type="search"
             placeholder="Search or jump to..."
             className="navbar-search-input"
           />
@@ -53,6 +49,7 @@ const Navbar = () => {
                 </div>
               )}
             </div>
+
             <div className="dropdown-container">
               <button
                 className="navbar-button profile-button"

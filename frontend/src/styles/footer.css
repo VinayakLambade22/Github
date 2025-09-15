@@ -1,0 +1,28 @@
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-top: 1px solid #30363d; 
+  color: #8b949e; 
+  font-size: 12px;
+}
+
+
+.footer-links ul {
+  display: flex;
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-links a {
+  color: #8b949e;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: #1f6feb; 
+  text-decoration: underline;
+}

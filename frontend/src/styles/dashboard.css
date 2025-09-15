@@ -1,37 +1,15 @@
-/* === GLOBAL & LAYOUT === */
 .dashboard-container {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr) 300px;
+  grid-template-columns: 2fr 5fr 2fr;
   gap: 24px;
-  max-width: 1280px;
-  margin: 32px auto;
-  padding: 0 24px;
 }
 
-@media (max-width: 1012px) {
-  .dashboard-container {
-    grid-template-columns: 240px minmax(0, 1fr);
-  }
-  .dashboard-sidebar.right {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard-container {
-    grid-template-columns: 1fr;
-  }
-  .dashboard-sidebar.left {
-    order: 2;
-  }
-  .dashboard-main {
-    order: 1;
-  }
-}
-
-/* === LEFT SIDEBAR === */
 .dashboard-sidebar.left {
   color: #c9d1d9;
+  background: #161b22;
+  height: 100vh;
+  border-right: 1px solid #30363d;
+  padding: 16px;
 }
 
 .sidebar-header {
@@ -66,7 +44,6 @@
   background-color: #2ea043;
 }
 
-/* --- Repo Filter Input --- */
 .repo-filter-container {
   padding: 8px 0 16px;
   border-bottom: 1px solid #21262d;
@@ -113,7 +90,7 @@
 }
 
 .repo-list li a span {
-  font-weight: 400; /* Regular weight for username part */
+  font-weight: 400;
   color: #c9d1d9;
   white-space: nowrap;
   overflow: hidden;
@@ -128,9 +105,12 @@
   padding: 16px;
 }
 
-/* === MAIN CONTENT === */
+.dashboard-main {
+  margin-top: 1.5rem;
+}
+
 .dashboard-main h2.dashboard-title {
-  font-size: 20px;
+  font-size: 25px;
   font-weight: 600;
   color: #c9d1d9;
   margin-top: 0;
@@ -168,8 +148,9 @@
   border-bottom: 1px solid #30363d;
   transition: background-color 0.2s ease-in-out;
 }
-.repo-item:hover{
-    background-color: #1f2733;
+
+.repo-item:hover {
+  background-color: #1f2733;
 }
 
 .repo-item:last-child {
@@ -202,7 +183,6 @@ p.repo-description {
   color: #8b949e;
 }
 
-/* --- Repo Meta (Stars, Language) --- */
 .repo-meta {
   display: flex;
   align-items: center;
@@ -222,19 +202,19 @@ p.repo-description {
 }
 
 .language-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 1px solid #4a5461;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #4a5461;
 }
 
-
-/* === RIGHT SIDEBAR === */
 .dashboard-sidebar.right {
   color: #c9d1d9;
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Space between cards */
+  gap: 16px;
+  margin: 32px auto;
+  padding-right: 24px;
 }
 
 .sidebar-card {
@@ -271,23 +251,22 @@ p.repo-description {
   text-decoration: underline;
 }
 
-/* --- Changelog Card --- */
 .changelog-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .changelog-item a {
-    color: #c9d1d9;
-    text-decoration: none;
-    font-size: 13px;
+  color: #c9d1d9;
+  text-decoration: none;
+  font-size: 13px;
 }
 
 .changelog-item a:hover {
-    color: #58a6ff;
-    text-decoration: underline;
+  color: #58a6ff;
+  text-decoration: underline;
 }
