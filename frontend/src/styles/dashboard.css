@@ -117,15 +117,11 @@
   margin-bottom: 16px;
 }
 
-.feed-card {
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  background-color: #161b22;
-}
-
 .feed-header {
   padding: 16px;
-  border-bottom: 1px solid #30363d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  margin-bottom: 16px;
 }
 
 .feed-header h3 {
@@ -145,16 +141,15 @@
   align-items: flex-start;
   gap: 16px;
   padding: 16px;
-  border-bottom: 1px solid #30363d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
   transition: background-color 0.2s ease-in-out;
+  background-color: #161b22;
+  margin-bottom: 0.5rem;
 }
 
 .repo-item:hover {
   background-color: #1f2733;
-}
-
-.repo-item:last-child {
-  border-bottom: none;
 }
 
 .repo-item-icon {

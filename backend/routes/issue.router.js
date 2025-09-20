@@ -6,7 +6,7 @@ const issueRouter = express.Router();
 issueRouter.post("/issue/create", protect, issueController.createIssue);
 issueRouter.get("/issue/repo/:repoId", issueController.getAllIssuesForRepo);
 
-module.exports = issueRouter
+module.exports = issueRouter;
 
 // issueRouter.post("/issue/create", issueController.createIssue);
 

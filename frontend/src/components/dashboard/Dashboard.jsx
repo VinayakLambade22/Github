@@ -133,41 +133,40 @@ const Dashboard = () => {
 
         <main className="dashboard-main">
           <h2 className="dashboard-title">Home</h2>
-          <div className="feed-card">
-            <div className="feed-header">
-              <h3>Discover popular repositories</h3>
-              <p>Explore projects that are popular on GitHub.</p>
-            </div>
-            {popularRepos.map((repo) => (
-              <div className="repo-item" key={repo.name}>
-                <BookIcon size={16} className="repo-item-icon" />
-                <div className="repo-item-content">
-                  <a
-                    href={repo.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="repo-link"
-                  >
-                    {repo.name}
-                  </a>
-                  <p className="repo-description">{repo.description}</p>
-                  <div className="repo-meta">
-                    <span className="meta-item">
-                      <StarIcon size={16} />
-                      <span>{repo.stars}</span>
-                    </span>
-                    <span className="meta-item">
-                      <span
-                        className="language-dot"
-                        style={{ backgroundColor: repo.langColor }}
-                      ></span>
-                      <span>{repo.language}</span>
-                    </span>
-                  </div>
+
+          <div className="feed-header">
+            <h3>Discover popular repositories</h3>
+            <p>Explore projects that are popular on GitHub.</p>
+          </div>
+          {popularRepos.map((repo) => (
+            <div className="repo-item" key={repo.name}>
+              <BookIcon size={16} className="repo-item-icon" />
+              <div className="repo-item-content">
+                <a
+                  href={repo.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="repo-link"
+                >
+                  {repo.name}
+                </a>
+                <p className="repo-description">{repo.description}</p>
+                <div className="repo-meta">
+                  <span className="meta-item">
+                    <StarIcon size={16} />
+                    <span>{repo.stars}</span>
+                  </span>
+                  <span className="meta-item">
+                    <span
+                      className="language-dot"
+                      style={{ backgroundColor: repo.langColor }}
+                    ></span>
+                    <span>{repo.language}</span>
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </main>
 
         <aside className="dashboard-sidebar right">
